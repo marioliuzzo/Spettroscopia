@@ -1,6 +1,8 @@
+import os 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+
 
 
 counts = np.loadtxt('Cs137_1.txt', skiprows=12, max_rows=2048, unpack = True)
