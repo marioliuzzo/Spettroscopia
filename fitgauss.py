@@ -19,10 +19,10 @@ def gaussiana(x, mu, sigma, A, B):
     """Funzione per fit gaussiano channels-counts."""
     return A*(1/(sigma*np.sqrt(2*np.pi)))*np.exp(-0.5*((x-mu)/sigma)**2) + B
 
-channels1 = np.array([channels[i] for i in range(70, 106)], dtype = float) #canali vicino al picco, da n a n_max-1
-counts1 = np.array([counts[i] for i in range(70, 106)], dtype = float)
+channels1 = np.array([channels[i] for i in range(69, 110)], dtype = float) #canali vicino al picco, da n a n_max-1
+counts1 = np.array([counts[i] for i in range(69, 110)], dtype = float)
 
-init_values = [90., 5., 2000., 300.]
+init_values = [91., 7., 600000., 70.]
 pars, covm = curve_fit(gaussiana, channels1, counts1, init_values)
 
 mu0, sigma0, A0, B0 = pars
