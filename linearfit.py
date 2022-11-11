@@ -20,6 +20,7 @@ print(f'a = {a0:.3f} +- {da:.3f}')
 print(f'b = {b0:.3f} +- {db:.3f}')
 print(f'chisq/ndof = {chisq:.3f}/{ndof}')
 print(covm)
+
 plt.errorbar(Energy, Channel, dChannel, dEnergy, marker = 'o', linestyle = '')
 x = np.linspace(Energy[0], Energy[-1], 100)
 plt.plot(x, linear_fit(x, *pars), color = 'r')
