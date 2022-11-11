@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 
 
 PATH = 'C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri'#percorso dei file .txt
-NOME_SPETTRO = 'Cs137_1.txt' #modificare con il nome del file
+NOME_SPETTRO = 'Am241_1.txt' #modificare con il nome del file
 PATH = os.path.join(PATH, NOME_SPETTRO) 
 
 #mette i risultati del fit nel file NOME_SPETTROlog.txt
@@ -19,10 +19,10 @@ def gaussiana(x, mu, sigma, A, B):
     """Funzione per fit gaussiano channels-counts."""
     return A*(1/(sigma*np.sqrt(2*np.pi)))*np.exp(-0.5*((x-mu)/sigma)**2) + B
 
-channels1 = np.array([channels[i] for i in range(440, 525)], dtype = float) #canali vicino al picco, da n a n_max-1
-counts1 = np.array([counts[i] for i in range(440, 525)], dtype = float)
+channels1 = np.array([channels[i] for i in range(69, 110)], dtype = float) #canali vicino al picco, da n a n_max-1
+counts1 = np.array([counts[i] for i in range(69, 110)], dtype = float)
 
-init_values = [500., 21., 3000., 30.]
+init_values = [91., 7., 600000., 70.]
 pars, covm = curve_fit(gaussiana, channels1, counts1, init_values)
 
 mu0, sigma0, A0, B0 = pars
@@ -30,16 +30,15 @@ dmu, dsigma, dA, dB = np.sqrt(covm.diagonal())
 #dy = np.ones(len(counts1))
 #chisq = (((counts1-gaussiana(channels1, mu0, sigma0, A0, B0))/dy)**2).sum()
 #ndof = len(channels1)-4
-logging.info(f'media = {mu0:.3f} +- {dmu:.3f}')
-logging.info(f'dev. std = {sigma0:.3f} +- {dsigma:.3f}')
-logging.info(f'A = {A0:.3f} +- {B0:.3f}')
-logging.info(f'B = {B0:.3f} +- {dB:.3f}')
+logging.info(f'Range di canali: {channels1[0]}-{channels1[-1]}\n')
+logging.info(f'media = {mu0:.3f} +- {dmu:.3f}\n')
+logging.info(f'dev. std = {sigma0:.3f} +- {dsigma:.3f}\n')
+logging.info(f'A = {A0:.3f} +- {B0:.3f}\n')
+logging.info(f'B = {B0:.3f} +- {dB:.3f}\n')
 #logging.info(f'chisq/ndof = {chisq:.3f}/{ndof}')
 
-
-plt.plot(channels, counts, marker = 'o')
 plt.plot(channels1, gaussiana(channels1, mu0, sigma0, A0, B0), color = 'red')
-
+plt.plot(channels1, counts1, marker = 'o')
 NOME_SPETTRO = NOME_SPETTRO.replace('_1.txt', '')
 plt.title('Channels vs counts' + ' ' + NOME_SPETTRO)
 plt.xlabel('Channels')
