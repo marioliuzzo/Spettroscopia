@@ -13,7 +13,7 @@ pars, covm = curve_fit(linear_fit, Energy, Channel, init_values, dChannel)
 a0, b0 = pars
 da, db = np.sqrt(covm.diagonal())
 
-chisq = (((Channel - linear_fit(Channel, a0, b0))/dChannel)**2).sum()
+chisq = (((Channel - linear_fit(Energy, a0, b0))/dChannel)**2).sum()
 ndof = len(Energy) - 2
 
 print(f'a = {a0:.3f} +- {da:.3f}')
