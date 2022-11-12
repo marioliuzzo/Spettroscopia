@@ -22,7 +22,7 @@ def gaussiana(x, mu, sigma, A, B):
 channels1 = np.array([channels[i] for i in range(69, 110)], dtype = float) #canali vicino al picco, da n a n_max-1
 counts1 = np.array([counts[i] for i in range(69, 110)], dtype = float)
 
-init_values = [91., 7., 600000., 70.]
+init_values = [91., 6., 500000., 2000.]
 pars, covm = curve_fit(gaussiana, channels1, counts1, init_values)
 
 mu0, sigma0, A0, B0 = pars
@@ -30,7 +30,7 @@ dmu, dsigma, dA, dB = np.sqrt(covm.diagonal())
 #dy = np.ones(len(counts1))
 #chisq = (((counts1-gaussiana(channels1, mu0, sigma0, A0, B0))/dy)**2).sum()
 #ndof = len(channels1)-4
-logging.info(f'Range di canali: {channels1[0]}-{channels1[-1]}\n')
+logging.info(f'Range di canali: {channels1[0]}-{channels1[-1]}\n')  
 logging.info(f'media = {mu0:.3f} +- {dmu:.3f}\n')
 logging.info(f'dev. std = {sigma0:.3f} +- {dsigma:.3f}\n')
 logging.info(f'A = {A0:.3f} +- {B0:.3f}\n')
