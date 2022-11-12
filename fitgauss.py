@@ -10,7 +10,7 @@ NOME_SPETTRO = 'Am241_1.txt' #modificare con il nome del file
 PATH = os.path.join(PATH, NOME_SPETTRO) 
 
 #mette i risultati del fit nel file NOME_SPETTROlog.txt
-logging.basicConfig(filename = NOME_SPETTRO.replace('txt', 'log.txt'), level = logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
+logging.basicConfig(filename = NOME_SPETTRO.replace('txt', '_bckg_log.txt'), level = logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
 counts = np.loadtxt(PATH, skiprows=12, max_rows=2048, unpack = True) #salta i commenti ed acquisice i conteggi dei canali 0-2047
 channels = np.array([i for i in range(0, 2048)], dtype = float) #numero di canali
