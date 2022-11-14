@@ -4,6 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+"""
+======================================================================================================
+Fit gaussiano nell'intorno dei picchi, per ricavare media (posizione del canale), deviazione standard,
+ampiezza ed offset.
+======================================================================================================
+"""
+
 if __name__ == '__main__':
     PATH = 'C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri'#percorso dei file .txt
     NOME_SPETTRO = 'Am241_1.txt' #modificare con il nome del file
@@ -19,7 +26,8 @@ if __name__ == '__main__':
     counts1 = np.array([counts[i] for i in range(69, 110)], dtype = float)
 
     def gaussiana(x, mu, sigma, A, B):
-        """Funzione per fit gaussiano channels-counts."""
+        """Funzione per fit gaussiano channels-counts. A è l'ampiezza della gaussiana
+        B è l'offset."""
         return A*(1/(sigma*np.sqrt(2*np.pi)))*np.exp(-0.5*((x-mu)/sigma)**2) + B
 
     init_values = [91., 6., 500000., 2000.]

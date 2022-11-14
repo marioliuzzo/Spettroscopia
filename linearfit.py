@@ -2,6 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+"""
+================================================================================================
+Fit lineare per la calibrazione canali-energia, con le sorgenti di Am241, Cs137_2, Co61, Na22
+================================================================================================
+"""
+
+
 Energy, Channel, dChannel = np.loadtxt('linear.txt', unpack = True)
 dEnergy = np.zeros(len(Energy))
 
