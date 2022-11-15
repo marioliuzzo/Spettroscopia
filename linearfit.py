@@ -4,7 +4,7 @@ from scipy.optimize import curve_fit
 
 """
 ================================================================================================
-Fit lineare per la calibrazione canali-energia, con le sorgenti di Am241, Cs137_2, Co61, Na22
+Fit lineare per la calibrazione canali-energia, con le sorgenti di Am241, Ba133, Cs137_2, Co61, Na22
 ================================================================================================
 """
 

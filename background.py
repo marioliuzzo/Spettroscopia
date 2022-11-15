@@ -45,10 +45,10 @@ for j in range(len(counts)):
 
 
 """Trova tutti gli indici neg_ind per cui la doppia convoluzione è negativa e maggiore in modulo 
-di una certa prominence (distanza dalla base) i picchi corrispondono
+di una certa prominence (distanza dalla base), i picchi corrispondono
 ai minimi della doppia convoluzione."""
 
-[neg_ind, _] = find_peaks(-convolved2, prominence = 20)
+[neg_ind, _] = find_peaks(-convolved2, prominence = 10)
 print(f'Canali dei picchi: {neg_ind}\n')
 
 """Interpolazione lineare per trovare gli zeri di channels-convolved2."""
@@ -63,11 +63,20 @@ for zc_i in zc_indx:
 
 print(f'Zeri della funzione di doppia convoluzione: {conv_zero[0:2*len(neg_ind)]}\n')
 
+#conv_zero_left = conv_zero[:len(neg_ind) + 3:2]
+#conv_zero_right = conv_zero[1:len(neg_ind) + 4:2]
+#print(conv_zero_left, conv_zero_right)
+
+sigma_left = np.array(np.sqrt(np.abs((conv_zero[:2*len(neg_ind):2] - neg_ind)**2 - 2*delta**2)))
+sigma_right = np.array(np.sqrt(np.abs((conv_zero[1:2*len(neg_ind):2] - neg_ind)**2 - 2*delta**2)))
+
+print(f'sigma_left: {sigma_left}\n')
+print(f'sigma_right: {sigma_right}\n')
 
 """Metodo per trovare il background. m corrisponde alla FWHM del picco più largo, da trovare con
 l'algoritmo per i picchi."""
 media = 1600
-sigma = 26
+sigma = 27
 m = int(np.floor(2.35*sigma))
 k = np.array([i for i in counts])
 z = np.zeros(len(counts))
@@ -88,8 +97,8 @@ plt.ylabel('Counts')
 plt.plot(neg_ind, convolved2[neg_ind], marker = 'P', label = 'Picchi')
 plt.plot(channels, convolved2, marker = 'o', label = 'Doppia convoluzione con $-\dfrac{x_{channel}-y}{\delta^2}e^{-\dfrac{(x_{channel}-y)^2}{2\delta^2}}$')
 plt.plot(channels, counts, marker = 'o', color = 'b', label = 'Dati')
-#plt.plot(channels, k, marker = 'o', color = 'r', label = 'Fondo')
-#plt.plot(channels, net_counts, marker = 'o', label = 'Net counts')
+plt.plot(channels, k, marker = 'o', color = 'r', label = 'Fondo')
+plt.plot(channels, net_counts, marker = 'o', color = 'skyblue', label = 'Net counts')
 plt.minorticks_on()
 plt.legend()
 plt.show()
