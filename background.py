@@ -4,101 +4,146 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
-PATH = 'C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri'#percorso dei file .txt
-NOME_SPETTRO = 'Cs137_2.txt' #modificare con il nome del file
-PATH = os.path.join(PATH, NOME_SPETTRO) 
+PATH = 'C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri/'  # percorso dei file .txt
+NOME_SPETTRO = 'Ba133_1.txt'  # modificare con il nome del file
+PATH_SPETTRO = os.path.join(PATH, NOME_SPETTRO)
 
-counts = np.loadtxt(PATH, skiprows=12, max_rows=2048, unpack = True) #salta i commenti ed acquisice i conteggi dei canali 0-2047
-channels = np.array([i for i in range(0, 2048)], dtype = float) #numero di canali
+# salta i commenti ed acquisice i conteggi dei canali 0-2047
+counts = np.loadtxt(PATH_SPETTRO, skiprows=12, max_rows=2048, unpack=True)
+channels = np.array([i for i in range(0, 2048)],
+                    dtype=float)  # numero di canali
 
-"""Convoluzione per trovare i picchi e le loro larghezze."""
+NOME_BCKG = 'fondo_54437.txt'
+PATH_BCKG = os.path.join(PATH, NOME_BCKG)
 
-convolved = np.zeros(len(counts))
-convolved2 = np.zeros(len(counts))
-
-"""Trova la delta ottimale per il filtro gaussiano di convoluzione, ovvero quella per cui 
-la doppia convoluzione ha un minimo."""
-delta_min = 1
-delta_max = 40
-min_convolv = np.array([])
-for delta in range(delta_min, delta_max + 1):
-    """Prima convoluzione con la derivata prima della gaussiana."""
-    for j in range(len(counts)):
-        convolved[j] = (-counts*((channels - j)/delta**2)*np.exp(-((channels - j)**2/(2*delta**2)))).sum()
-
-    """Seconda convoluzione della convoluzione precedente con la derivata prima della gaussiana."""
-    for j in range(len(counts)):
-        convolved2[j] = (-convolved*((channels - j)/delta**2)*np.exp(-((channels - j)**2/(2*delta**2)))).sum()
-    
-    min_convolv = np.append(min_convolv, [np.amin(convolved2)])
-
-delta = np.argmin(min_convolv) + 1
-print(f'Delta ottimale = {delta}\n')
-
-"""Prima convoluzione con la derivata prima della gaussiana."""
-for j in range(len(counts)):
-    convolved[j] = (-counts*((channels - j)/delta**2)*np.exp(-((channels - j)**2/(2*delta**2)))).sum()
-
-"""Seconda convoluzione della convoluzione precedente con la derivata prima della gaussiana."""
-for j in range(len(counts)):
-    convolved2[j] = (-convolved*((channels - j)/delta**2)*np.exp(-((channels - j)**2/(2*delta**2)))).sum()
-
-
-"""Trova tutti gli indici neg_ind per cui la doppia convoluzione è negativa e maggiore in modulo 
-di una certa prominence (distanza dalla base), i picchi corrispondono
-ai minimi della doppia convoluzione."""
-
-[neg_ind, _] = find_peaks(-convolved2, prominence = 10)
-print(f'Canali dei picchi: {neg_ind}\n')
-
-"""Interpolazione lineare per trovare gli zeri di channels-convolved2."""
-zc_indx = np.where(np.diff(np.sign(convolved2))) #indice prima di passare lo zero
-conv_zero = np.array([]) #array che contiene gli indici degli zeri
-for zc_i in zc_indx:
-    t1 = channels[zc_i]
-    t2 = channels[zc_i]
-    a1 = convolved2[zc_i]
-    a2 = convolved2[zc_i + 1]
-    conv_zero = np.append((conv_zero), [(t1 + (0 - a1) * ((t2 - t1) / (a2 - a1)))])
-
-print(f'Zeri della funzione di doppia convoluzione: {conv_zero[0:2*len(neg_ind)]}\n')
-
-#conv_zero_left = conv_zero[:len(neg_ind) + 3:2]
-#conv_zero_right = conv_zero[1:len(neg_ind) + 4:2]
-#print(conv_zero_left, conv_zero_right)
-
-sigma_left = np.array(np.sqrt(np.abs((conv_zero[:2*len(neg_ind):2] - neg_ind)**2 - 2*delta**2)))
-sigma_right = np.array(np.sqrt(np.abs((conv_zero[1:2*len(neg_ind):2] - neg_ind)**2 - 2*delta**2)))
-
-print(f'sigma_left: {sigma_left}\n')
-print(f'sigma_right: {sigma_right}\n')
-
-"""Metodo per trovare il background. m corrisponde alla FWHM del picco più largo, da trovare con
-l'algoritmo per i picchi."""
-media = 1600
-sigma = 27
-m = int(np.floor(2.35*sigma))
-k = np.array([i for i in counts])
-z = np.zeros(len(counts))
-for p in range(1, m+1):
-    for i in range(p-1, len(counts)-p):
-        z[i] = min(k[i], 0.5*(k[i-p] + k[i+p]))
-    for i in range(p-1, len(counts)-p):
-        k[i] = z[i]
-
-net_counts = np.array([i for i in counts]) - k
+background = np.loadtxt(PATH_BCKG, skiprows=12, max_rows=2048, unpack=True)
 
 NOME_SPETTRO = NOME_SPETTRO.replace('_2.txt', '')
 NOME_SPETTRO = NOME_SPETTRO.replace('_1.txt', '')
-plt.title('Counts and background'+ ' ' + NOME_SPETTRO + ' ' + f'$\delta$ = {delta}')
-plt.xlabel('Channels')
-plt.ylabel('Counts')
-#plt.plot(conv_zero, np.zeros(len(conv_zero)), 'o')
-plt.plot(neg_ind, convolved2[neg_ind], marker = 'P', label = 'Picchi')
-plt.plot(channels, convolved2, marker = 'o', label = 'Doppia convoluzione con $-\dfrac{x_{channel}-y}{\delta^2}e^{-\dfrac{(x_{channel}-y)^2}{2\delta^2}}$')
-plt.plot(channels, counts, marker = 'o', color = 'b', label = 'Dati')
-plt.plot(channels, k, marker = 'o', color = 'r', label = 'Fondo')
-plt.plot(channels, net_counts, marker = 'o', color = 'skyblue', label = 'Net counts')
-plt.minorticks_on()
-plt.legend()
-plt.show()
+
+#live time di acquisizione del background e dei radionuclidi
+LIVE_TIME_BCKG = 54437
+LIVE_TIME = {'Am241': 271, 'Ba133': 233,
+             'Co60': 344, 'Na22': 1517, 'Cs137': 194}
+
+background = background * LIVE_TIME[NOME_SPETTRO]/LIVE_TIME_BCKG
+
+def find_delta(channels, counts):
+    """Trova la delta ottimale per il filtro gaussiano di convoluzione, ovvero quella per cui 
+    la doppia convoluzione ha un minimo."""
+    delta_min = 1
+    delta_max = 40
+    min_convolv = np.array([])
+
+    for delta in range(delta_min, delta_max + 1):
+        C1 = Iconvolution(channels, counts, delta)
+        C2 = IIconvolution(channels, counts, delta, C1)
+        min_convolv = np.append(min_convolv, [np.amin(C2)])
+    return np.argmin(min_convolv) + 1
+
+
+def Iconvolution(channels, counts, delta):
+    """Prima convoluzione con la derivata prima della gaussiana."""
+    convolved = np.zeros(len(counts))
+    for j in range(len(counts)):
+        convolved[j] = (-counts*((channels - j)/delta**2) *
+                        np.exp(-((channels - j)**2/(2*delta**2)))).sum()
+    return convolved
+
+
+def IIconvolution(channels, counts, delta, convolved):
+    """Seconda convoluzione della convoluzione precedente con la derivata prima della gaussiana."""
+    convolved2 = np.zeros(len(counts))
+    for j in range(len(counts)):
+        convolved2[j] = (-convolved*((channels - j) /
+                         delta**2)*np.exp(-((channels - j)**2/(2*delta**2)))).sum()
+    return convolved2
+
+
+def find_neg_index(delta, channels, counts):
+    """Trova tutti gli indici neg_ind per cui la doppia convoluzione è negativa e maggiore in modulo 
+    di una certa prominence (distanza dalla base), i picchi corrispondono
+    ai minimi della doppia convoluzione."""
+    convolved = Iconvolution(channels, counts, delta)
+    convolved2 = IIconvolution(channels, counts, delta, convolved)
+    [neg_ind, _] = find_peaks(-convolved2, prominence=10)
+    return [neg_ind, _]
+#    print(f'Canali dei picchi: {neg_ind}\n')
+
+
+def lin_interpol(delta, channels, counts):
+    """Interpolazione lineare per trovare gli zeri di channels-convolved2."""
+    convolved = Iconvolution(channels, counts, delta)
+    convolved2 = IIconvolution(channels, counts, delta, convolved)
+    neg_ind = find_neg_index(delta, channels, counts)
+    zc_indx = np.where(np.diff(np.sign(convolved2))
+                       )  # indice prima di passare lo zero
+    conv_zero = np.array([])  # array che contiene gli indici degli zeri
+    for zc_i in zc_indx:
+        t1 = channels[zc_i]
+        t2 = channels[zc_i]
+        a1 = convolved2[zc_i]
+        a2 = convolved2[zc_i + 1]
+        conv_zero = np.append(
+            (conv_zero), [(t1 + (0 - a1) * ((t2 - t1) / (a2 - a1)))])
+
+    return conv_zero
+
+
+def fondo(counts, sigma):
+    """Metodo per trovare il background. m corrisponde alla FWHM del picco più largo, da trovare con
+    l'algoritmo per i picchi."""
+    m = int(np.floor(2.35*sigma))
+    k = np.array([i for i in counts])
+    z = np.zeros(len(counts))
+    for p in range(1, m+1):
+        for i in range(p-1, len(counts)-p):
+            z[i] = min(k[i], 0.5*(k[i-p] + k[i+p]))
+        for i in range(p-1, len(counts)-p):
+            k[i] = z[i]
+    return k
+
+
+if __name__ == '__main__':
+
+    delta = find_delta(channels, counts)
+    print(f'Delta ottimale = {delta}\n')
+
+    convolved = Iconvolution(channels, counts, delta)
+    convolved2 = IIconvolution(channels, counts, delta, convolved)
+
+    [neg_ind, _] = find_neg_index(delta, channels, counts)
+    conv_zero = lin_interpol(delta, channels, counts)
+
+    #calcolo della sigma_left e right per ogni picco, calcolate come 
+    # sqrt(|(zero-picco)**2 - 2*delta_ottimale**2|)
+    sigma_left = np.array(
+        np.sqrt(np.abs((conv_zero[:2*len(neg_ind):2] - neg_ind)**2 - 2*delta**2)))
+    sigma_right = np.array(
+        np.sqrt(np.abs((conv_zero[1:2*len(neg_ind):2] - neg_ind)**2 - 2*delta**2)))
+    
+    fondo = fondo(counts, 27)
+    print(f'Canali dei picchi: {neg_ind}\n')
+    print(
+        f'Zeri della funzione di doppia convoluzione: {conv_zero[0:2*len(neg_ind)]}\n')
+
+    net_counts = np.array([i for i in counts]) - fondo
+
+    print(f'sigma_left: {sigma_left}\n')
+    print(f'sigma_right: {sigma_right}\n')
+
+    plt.title('Counts and background' + ' ' +
+              NOME_SPETTRO + ' ' + f'$\delta$ = {delta}')
+    plt.xlabel('Channels')
+    plt.ylabel('Counts')
+    #plt.plot(conv_zero, np.zeros(len(conv_zero)), 'o')
+    plt.plot(neg_ind, convolved2[neg_ind], marker='P', label='Picchi')
+    plt.plot(channels, convolved2, marker='o',
+             label='Doppia convoluzione con $-\dfrac{x_{channel}-y}{\delta^2}e^{-\dfrac{(x_{channel}-y)^2}{2\delta^2}}$')
+    plt.plot(channels, counts, marker='o', color='b', label='Dati')
+    plt.plot(channels, fondo, marker='o', color='r', label='Fondo')
+    plt.plot(channels, net_counts, marker='o', color='skyblue', label='Net counts')
+    plt.plot(channels, background, marker = 'o', label = 'Fondo true')
+    plt.minorticks_on()
+    plt.legend()
+    plt.show()
