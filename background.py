@@ -26,6 +26,9 @@ LIVE_TIME_BCKG = 54437
 LIVE_TIME = {'Am241': 271, 'Ba133': 233,
              'Co60': 344, 'Na22': 1517, 'Cs137': 194}
 
+#il background è riscalato con il rapporto fra il live time della
+#misura dello spettro ed il live time della misura del fondo senza
+#sorgente
 background = background * LIVE_TIME[NOME_SPETTRO]/LIVE_TIME_BCKG
 
 def find_delta(channels, counts):
@@ -68,7 +71,6 @@ def find_neg_index(delta, channels, counts):
     convolved2 = IIconvolution(channels, counts, delta, convolved)
     [neg_ind, _] = find_peaks(-convolved2, prominence=10)
     return [neg_ind, _]
-#    print(f'Canali dei picchi: {neg_ind}\n')
 
 
 def lin_interpol(delta, channels, counts):
@@ -134,8 +136,8 @@ if __name__ == '__main__':
 
     plt.title('Counts and background' + ' ' +
               NOME_SPETTRO + ' ' + f'$\delta$ = {delta}')
-    plt.xlabel('Channels')
-    plt.ylabel('Counts')
+    plt.xlabel('Channels [UA]')
+    plt.ylabel('Counts [UA]')
     #plt.plot(conv_zero, np.zeros(len(conv_zero)), 'o')
     plt.plot(neg_ind, convolved2[neg_ind], marker='P', label='Picchi')
     plt.plot(channels, convolved2, marker='o',
