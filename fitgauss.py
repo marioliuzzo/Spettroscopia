@@ -1,5 +1,6 @@
 import logging
 import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
@@ -12,7 +13,7 @@ ampiezza ed offset.
 """
 
 PATH = 'C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri'  # percorso dei file .txt
-NOME_SPETTRO = 'Ba133_1.txt'  # modificare con il nome del file
+NOME_SPETTRO = 'Am241_1.txt'  # modificare con il nome del file
 PATH = os.path.join(PATH, NOME_SPETTRO)
 
 # mette i risultati del fit nel file NOME_SPETTROlog.txt
@@ -28,10 +29,12 @@ channels = np.array([i for i in range(0, 2048)],
 channels1 = np.array([channels[i] for i in range(443, 523)], dtype=float)
 counts1 = np.array([counts[i] for i in range(443, 523)], dtype=float)
 
+
 def gaussiana(x, mu, sigma, A, B):
-        """Funzione per fit gaussiano channels-counts. A è l'ampiezza della gaussiana
-        B è l'offset."""
-        return A*(1/(sigma*np.sqrt(2*np.pi)))*np.exp(-0.5*((x-mu)/sigma)**2) + B
+    """Funzione per fit gaussiano channels-counts. A è l'ampiezza della gaussiana
+    B è l'offset."""
+    return A*(1/(sigma*np.sqrt(2*np.pi)))*np.exp(-0.5*((x-mu)/sigma)**2) + B
+
 
 def log_results(channel, mu, dmu, sigma, dsigma, A, dA, B, dB):
     """Inserisce i risultati del fit nel file NOME_SPETTRO_bckg.log.txt ."""
@@ -56,9 +59,11 @@ def plot_results(channels, counts, mu, sigma, A, B, NOME_SPETTRO):
 
 class Fit_iterator:
     """Iteratore di FitGauss."""
+
     def __init__(self, classe):
         self.classe = classe
         self.i = 0
+
     def __next__(self):
         if self.i < len(self.classe.Fit()[0]):
             result = self.classe.Fit()[0][self.i]
@@ -69,17 +74,21 @@ class Fit_iterator:
 
 class FitGauss:
     """Classe per il fit gaussiano."""
+
     def __init__(self, x, y, init):
         self.init = init
         self.x = x
         self. y = y
         self.pars = np.array([])
         self.covm = np.array([], [])
+
     def Fit(self):
         self.pars, self.covm = curve_fit(gaussiana, self.x, self.y, self.init)
         return self.pars, self.covm
+
     def __iter__(self):
         return Fit_iterator(self)
+
 
 if __name__ == '__main__':
 
