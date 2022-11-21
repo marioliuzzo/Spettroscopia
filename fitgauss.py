@@ -73,7 +73,9 @@ class Fit_iterator:
 
 
 class FitGauss:
-    """Classe per il fit gaussiano."""
+    """Classe per il fit gaussiano. Prende in input gli array di canali,
+    conteggi e valori iniziali e restituisce i parametri ottimali e la matrice
+    di correlazione."""
 
     def __init__(self, x, y, init):
         self.init = init
@@ -89,24 +91,29 @@ class FitGauss:
     def __iter__(self):
         return Fit_iterator(self)
 
-
-if __name__ == '__main__':
-
-    init_values = [482., 21., 500000., 2000.]
-    F = FitGauss(channels1, counts1, init_values)
-    iterator = iter(F)
+def risultati(F):
+    """"Restituisce i risultati del fit, in ordine: media, sigma, A, B.
+    Prende in input la classe per il fit."""
     elem = np.array([])
+    iterator = iter(F)
     while True:
         try:
             # Get next element from TeamIterator object using iterator object
             elem = np.append(elem, [next(iterator)])
         except StopIteration:
             break
-    mu0 = elem[3]
-    sigma0 = elem[2]
-    A0 = elem[1]
-    B0 = elem[0]
+    return elem
+
+if __name__ == '__main__':
+
+    init_values = [482., 21., 500000., 2000.]
+    F = FitGauss(channels1, counts1, init_values)
+    risultati = risultati(F)
+    mu0 = risultati[0]
+    sigma0 = risultati[1]
+    A0 = risultati[2]
+    B0 = risultati[3]
     dm, dsigma, dA, dB = np.sqrt(F.covm.diagonal())
-    print(f'{mu0:.3f} + {dm:.3f}')
+    print(f'{B0:.3f} + {dB:.3f}')
 #    log_results(channels1, mu0, dmu, sigma0, dsigma, A0, dA, B0, dB)
 #    plot_results(channels1, counts1, mu0, sigma0, A0, B0, NOME_SPETTRO)
