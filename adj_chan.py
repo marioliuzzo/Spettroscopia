@@ -4,7 +4,7 @@ import fitgauss as fit
 import numpy as np
 """
 ------------------------------------------------------------
-Metodo per trovare il fondo con i canali adiacenti al picco
+Metodo per trovare il fondo con i canali adiacenti al picco.
 ------------------------------------------------------------
 """
 
@@ -14,7 +14,7 @@ PATH_BCKG = os.path.join('C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri/', 
 background = np.loadtxt(PATH_BCKG, skiprows=12, max_rows=2048, unpack=True)
 
 NOME_SPETTRO = fit.NOME_SPETTRO.replace('_2.txt', '')
-NOME_SPETTRO = fit.NOME_SPETTRO.replace('_1.txt', '')
+#NOME_SPETTRO = fit.NOME_SPETTRO.replace('_1.txt', '')
 
 #live time di acquisizione del background e dei radionuclidi
 LIVE_TIME_BCKG = 54437
@@ -29,10 +29,10 @@ background = background * LIVE_TIME[NOME_SPETTRO]/LIVE_TIME_BCKG
 channels = fit.channels
 counts = fit.counts
 
-channels1 = np.array([channels[i] for i in range(70, 110)], dtype=float)
-counts1 = np.array([counts[i] for i in range(70, 110)], dtype=float)
+channels1 = fit.channels1
+counts1 = fit.counts1
 
-init_values = init_values = [94., 5., 500000., 2000.]
+init_values = fit.init_values
 
 F = fit.FitGauss(channels1, counts1, init_values)
 risultati = fit.risultati(F)
@@ -107,16 +107,15 @@ A1 = risultati[2]
 B1 = risultati[3]
 
 dm1, dsigma1, dA1, dB1 = np.sqrt(F1.covm.diagonal())
+print(f'{mu1} +- {dm1}')
 FWHM = 2.35*sigma1
-#RISOLUZIONE = FWHM/mu0
-#print(f'Risoluzione = {RISOLUZIONE:.3f}\n')
 
 print(f'Area continuum = {AREA_CONTINUUM:.3f} +- {SIGMA_FONDO:.3f}\n')
 print(f'Area netta = {AREA_NETTA:.3f} +- {SIGMA_NETTA:.3f}\n')
-print(f'media = {mu0:.3f} +- {dm:.3f}\n')
-print(f'sigma = {sigma0:.3f} +- {dsigma:.3f}\n')
-print(f'A = {A0:.3f} +- {dA:.3f}\n')
-print(f'B = {B0:.3f} +- {dB:.3f}\n')
+#print(f'media = {mu0:.3f} +- {dm:.3f}\n')
+#print(f'sigma = {sigma0:.3f} +- {dsigma:.3f}\n')
+#print(f'A = {A0:.3f} +- {dA:.3f}\n')
+#print(f'B = {B0:.3f} +- {dB:.3f}\n')
 print(f'media netta = {mu1:.3f} +- {dm1:.3f}\n')
 print(f'sigma netta = {sigma1:.3f} +- {dsigma1:.3f}\n')
 

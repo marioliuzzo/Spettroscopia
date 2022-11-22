@@ -69,7 +69,7 @@ def find_neg_index(delta, channels, counts):
     ai minimi della doppia convoluzione."""
     convolved = Iconvolution(channels, counts, delta)
     convolved2 = IIconvolution(channels, counts, delta, convolved)
-    [neg_ind, _] = find_peaks(-convolved2, prominence=10)
+    [neg_ind, _] = find_peaks(-convolved2, prominence=100)
     return [neg_ind, _]
 
 
@@ -159,7 +159,7 @@ if __name__ == '__main__':
     #sigma_max che serve per trovare il fondo deve essere adattato alla larghezza
     #di ogni picco per trovare il fondo+continuum sotto allo stesso picco
     sigma_max = np.amax(sigma)
-    print(sigma_max)
+    #print(sigma_max)
     fondo = fondo(counts, sigma_max)
     print(f'Canali dei picchi: {neg_ind}\n')
     print(
@@ -176,8 +176,8 @@ if __name__ == '__main__':
     plt.ylabel('Counts [UA]')
     #plt.plot(conv_zero, np.zeros(len(conv_zero)), 'o')
     plt.plot(neg_ind, convolved2[neg_ind], marker='P', label='Picchi')
-    #plt.plot(channels, convolved2, marker='o',
-    #         label='Doppia convoluzione con $-\dfrac{x_{channel}-y}{\delta^2}e^{-\dfrac{(x_{channel}-y)^2}{2\delta^2}}$')
+    plt.plot(channels, convolved2, marker='o',
+             label='Doppia convoluzione con $-\dfrac{x_{channel}-y}{\delta^2}e^{-\dfrac{(x_{channel}-y)^2}{2\delta^2}}$')
     plt.plot(channels, counts, marker='o', color='b', label='Dati')
     #plt.plot(channels, fondo, marker='o', color='r', label='Fondo stimato')
     #plt.plot(channels, net_counts, marker='o', color='skyblue', label='Net counts')
