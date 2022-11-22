@@ -9,7 +9,7 @@ Fit lineare per la calibrazione canali-energia, con le sorgenti di Am241, Ba133,
 """
 
 
-Energy, Channel, dChannel = np.loadtxt('linear.txt', unpack = True)
+Energy, Channel, dChannel = np.loadtxt('C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/linear.txt', unpack = True)
 dEnergy = np.zeros(len(Energy))
 
 def linear_fit(x, a, b):
