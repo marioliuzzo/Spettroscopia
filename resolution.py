@@ -1,6 +1,8 @@
 import numpy as np
+import logging
 import linearfit as linear
 import adj_chan as adj
+
 
 """
 Calcolo della risoluzione energetica dalla media e deviazione standard date
@@ -8,6 +10,10 @@ dal fit gaussiano allo spettro al netto di fondo e continuum, in adj_chan.
 La media trovata viene convertita in energia [keV] attraverso la calibrazione,
 data dal fit in linearfit.
 """
+
+NOME_SPETTRO = adj.NOME_SPETTRO + '_res.txt'
+logging.basicConfig(filename=NOME_SPETTRO,
+                    level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
 FWHM = adj.FWHM
 sigma = adj.sigma1
@@ -30,4 +36,10 @@ RISOLUZIONE = FWHM/ener_calibration
 DRISOLUZIONE = 2.35*np.sqrt((dsigma/ener_calibration) **
                             2 + (sigma/(ener_calibration**2))**2*dener_calibration**2)
 
-print(f'\n Risoluzione energetica = {100*RISOLUZIONE:.3f} +- {100*DRISOLUZIONE:.3f} %\n')
+NOME_SPETTRO = NOME_SPETTRO.replace('_res.txt', '')
+logging.info(f'calibrazione energia {ener_calibration:.3f} +- {dener_calibration:.3f}\n')
+
+logging.info(f'Risoluzione energetica {NOME_SPETTRO} = {100*RISOLUZIONE:.3f} +- {100*DRISOLUZIONE:.3f} %\n')
+
+print(f'calibrazione energia {ener_calibration:.3f} +- {dener_calibration:.3f}\n')
+print(f'Risoluzione energetica {NOME_SPETTRO} = {100*RISOLUZIONE:.3f} +- {100*DRISOLUZIONE:.3f} %\n')
