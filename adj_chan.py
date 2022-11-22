@@ -14,7 +14,7 @@ PATH_BCKG = os.path.join('C:/Users/Lorenzo/Desktop/Lab/Spettroscopia/spettri/', 
 background = np.loadtxt(PATH_BCKG, skiprows=12, max_rows=2048, unpack=True)
 
 NOME_SPETTRO = fit.NOME_SPETTRO.replace('_2.txt', '')
-#NOME_SPETTRO = fit.NOME_SPETTRO.replace('_1.txt', '')
+NOME_SPETTRO = fit.NOME_SPETTRO.replace('_1.txt', '')
 
 #live time di acquisizione del background e dei radionuclidi
 LIVE_TIME_BCKG = 54437
@@ -46,6 +46,7 @@ dm, dsigma, dA, dB = np.sqrt(F.covm.diagonal())
 A = int(np.floor(mu0 - 3*sigma0))
 B = int(np.floor(mu0 + 3*sigma0))
 
+A = 445
 AREA_TOT = 0
 for i in range(A, B):
     AREA_TOT += counts[i]
@@ -107,7 +108,6 @@ A1 = risultati[2]
 B1 = risultati[3]
 
 dm1, dsigma1, dA1, dB1 = np.sqrt(F1.covm.diagonal())
-print(f'{mu1} +- {dm1}')
 FWHM = 2.35*sigma1
 
 print(f'Area continuum = {AREA_CONTINUUM:.3f} +- {SIGMA_FONDO:.3f}\n')
