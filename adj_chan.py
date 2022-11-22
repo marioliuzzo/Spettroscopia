@@ -47,7 +47,7 @@ A = int(np.floor(mu0 - 3*sigma0))
 B = int(np.floor(mu0 + 3*sigma0))
 
 AREA_TOT = 0
-for i in range(A, B + 1):
+for i in range(A, B):
     AREA_TOT += counts[i]
 
 VAR_AREA_TOT = AREA_TOT
