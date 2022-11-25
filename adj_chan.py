@@ -4,7 +4,7 @@ import fitgauss as fit
 import numpy as np
 """
 ------------------------------------------------------------
-Metodo per trovare il fondo con i canali adiacenti al picco
+Metodo per trovare il fondo con i canali adiacenti al picco.
 ------------------------------------------------------------
 """
 
@@ -29,10 +29,10 @@ background = background * LIVE_TIME[NOME_SPETTRO]/LIVE_TIME_BCKG
 channels = fit.channels
 counts = fit.counts
 
-channels1 = np.array([channels[i] for i in range(70, 110)], dtype=float)
-counts1 = np.array([counts[i] for i in range(70, 110)], dtype=float)
+channels1 = fit.channels1
+counts1 = fit.counts1
 
-init_values = init_values = [94., 5., 500000., 2000.]
+init_values = fit.init_values
 
 F = fit.FitGauss(channels1, counts1, init_values)
 risultati = fit.risultati(F)
@@ -46,8 +46,9 @@ dm, dsigma, dA, dB = np.sqrt(F.covm.diagonal())
 A = int(np.floor(mu0 - 3*sigma0))
 B = int(np.floor(mu0 + 3*sigma0))
 
+A = 445
 AREA_TOT = 0
-for i in range(A, B + 1):
+for i in range(A, B):
     AREA_TOT += counts[i]
 
 VAR_AREA_TOT = AREA_TOT
@@ -108,15 +109,13 @@ B1 = risultati[3]
 
 dm1, dsigma1, dA1, dB1 = np.sqrt(F1.covm.diagonal())
 FWHM = 2.35*sigma1
-#RISOLUZIONE = FWHM/mu0
-#print(f'Risoluzione = {RISOLUZIONE:.3f}\n')
 
 print(f'Area continuum = {AREA_CONTINUUM:.3f} +- {SIGMA_FONDO:.3f}\n')
 print(f'Area netta = {AREA_NETTA:.3f} +- {SIGMA_NETTA:.3f}\n')
-print(f'media = {mu0:.3f} +- {dm:.3f}\n')
-print(f'sigma = {sigma0:.3f} +- {dsigma:.3f}\n')
-print(f'A = {A0:.3f} +- {dA:.3f}\n')
-print(f'B = {B0:.3f} +- {dB:.3f}\n')
+#print(f'media = {mu0:.3f} +- {dm:.3f}\n')
+#print(f'sigma = {sigma0:.3f} +- {dsigma:.3f}\n')
+#print(f'A = {A0:.3f} +- {dA:.3f}\n')
+#print(f'B = {B0:.3f} +- {dB:.3f}\n')
 print(f'media netta = {mu1:.3f} +- {dm1:.3f}\n')
 print(f'sigma netta = {sigma1:.3f} +- {dsigma1:.3f}\n')
 
